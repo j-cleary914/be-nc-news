@@ -1,7 +1,17 @@
-exports.send405Error = (req, res, next) => {
-  res.status(405).send({ msg: "you cant use that method!" });
+exports.handlePSQLErrors = (err, req, res, next) => {
+  //console.log(err);
+  let errorObject = {
+    "22P02": { status: 400, msg: "invalid input syntax, not an integer" },
+    
+  };
+  if (err.code === "22P02") {
+    next(errorObject["22P02"]);
+  }
+
+  next(err);
 };
 
-exports.sendError = (err, req, res, next) => {
-  res.status(404).send({ msg: err.msg });
+exports.handleCustomErrors = (err, req, res, next) => {
+  //console.log(err);
+  res.status(err.status).send({ msg: err.msg });
 };
