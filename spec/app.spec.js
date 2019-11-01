@@ -414,6 +414,7 @@ describe("/api", () => {
             .send({})
             .expect(400)
             .then(response => {
+              //console.log(response.body);
               expect(response.body.msg).to.equal(
                 "required value can not be null"
               );
