@@ -4,7 +4,7 @@ exports.handlePSQLErrors = (err, req, res, next) => {
     "22P02": { status: 400, msg: "invalid input syntax, not an integer" },
     "42703": { status: 400, msg: "column does not exist" },
     "23502": { status: 400, msg: "required value can not be null" },
-    "23503": { status: 400, msg: "foreign key violated" }
+    "23503": { status: 404, msg: "youre looking for smth that doesnt exist" }
   };
   if (err.code === "22P02") {
     next(errorObject["22P02"]);

@@ -94,7 +94,7 @@ exports.fetchArticle = article_id => {
     });
 };
 
-exports.updateArticleVotes = (article_id, updateBy) => {
+exports.updateArticleVotes = (article_id, updateBy = 0) => {
   // console.log("inside model", article_id, updateBy);
   return connection
     .where({ article_id: article_id })
@@ -124,13 +124,35 @@ exports.fetchComments = (article_id, sort_by, order) => {
     .where("article_id", article_id)
     .select("comment_id", "votes", "created_at", "author", "body")
     .orderBy(sort_by || "created_at", order || "desc")
-    .then(x => {
-      if (x.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "no article with that article_id"
-        });
+    .then(commentArray => {
+      if (commentArray.length > 0) {
+        return [commentArray];
       }
-      return x;
+      //check if article_id exists
+
+      let articlesPromise = exports.fetchArticles();
+      return Promise.all([commentArray, articlesPromise]);
+    })
+    .then(response => {
+      [comments, articlesArray] = response;
+      //console.log(comments);
+      if (comments.length > 0) {
+        return comments;
+      }
+      //console.log({ comments }, { articlesArray }, typeof article_id);
+      let number_article_id = Number(article_id);
+      let count = 0;
+      articlesArray.forEach(comment => {
+        if (comment.article_id === number_article_id) {
+          count++;
+        }
+      });
+      if (count > 0) {
+        return [];
+      }
+      return Promise.reject({
+        status: 404,
+        msg: "no article with that article_id"
+      });
     });
 };

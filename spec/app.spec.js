@@ -263,13 +263,22 @@ describe("/api", () => {
         });
     });
 
-    it("PATCH updates the votes of an article by the given amount", () => {
+    it("PATCH:200 updates the votes of an article by the given amount", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: 10 })
         .expect(200)
         .then(response => {
           expect(response.body.article.votes).to.equal(110);
+        });
+    });
+    it("PATCH:200 returns original comment if no body sent", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({})
+        .expect(200)
+        .then(response => {
+          expect(response.body.article.votes).to.equal(100);
         });
     });
     describe("ERRORS:", () => {
@@ -335,8 +344,7 @@ describe("/api", () => {
         .get("/api/articles/5/comments")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
-          //expect it to be an array
+          //console.log(response.body.comments);
           expect(response.body.comments[0]).to.have.all.keys([
             "comment_id",
             "votes",
@@ -344,6 +352,14 @@ describe("/api", () => {
             "author",
             "body"
           ]);
+        });
+    });
+    it("GET:200, an empty array if valid article_id but no comments", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(response => {
+          expect(response.body.comments).to.eql([]);
         });
     });
     it("GET:200, sorts by a column provided in query, defaults to descending", () => {
@@ -403,16 +419,18 @@ describe("/api", () => {
               );
             });
         });
-        it("POST:something", () => {
+        it("POST:404, returns 404 when given a valid ID that doesn't exist", () => {
           return request(app)
             .post("/api/articles/1000/comments")
             .send({
               username: "butter_bridge",
               body: "a new and exciting comment"
             })
-            .expect(400)
+            .expect(404)
             .then(response => {
-              expect(response.body.msg).to.equal("foreign key violated");
+              expect(response.body.msg).to.equal(
+                "youre looking for smth that doesnt exist"
+              );
             });
         });
         it("GET:404, returns 404 when given valid article-id that does not exist", () => {
