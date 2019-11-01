@@ -14,6 +14,15 @@ describe("/api", () => {
     connection.destroy();
   });
 
+  it.only("GET:200, responds with a json object describing all of the available endpoints on the API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(response => {
+        expect(response.body).to.be.an("object");
+      });
+  });
+
   describe("/topics", () => {
     it("GET:200, returns an array of all the topics in the database", () => {
       return request(app)
@@ -469,7 +478,6 @@ describe("/api", () => {
         .delete("/api/comments/1")
         .expect(204)
         .then(response => {
-          console.log(response.body);
           expect(response.body).to.eql({});
         });
     });
