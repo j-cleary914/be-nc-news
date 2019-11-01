@@ -7,8 +7,7 @@ const {
   deleteComment
 } = require("../controllers/commentsController.js");
 
-// commentsRouter.route("/:comment_id").patch(patchCommentVotes);
-// commentsRouter.route("/:comment_id").delete(deleteComment);
+
 
 commentsRouter
   .route("/:comment_id")

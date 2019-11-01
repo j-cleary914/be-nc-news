@@ -7,16 +7,13 @@ const {
 } = require("../models/articlesModel");
 
 exports.getArticles = (req, res, next) => {
-  //console.log(req.query);
   let order = req.query.order;
   let sort_by = req.query.sort_by;
   let author = req.query.author;
   let topic = req.query.topic;
 
-  //console.log({ sort_by }, { order }, { author }, { topic });
   fetchArticles(sort_by, order, author, topic)
     .then(articles => {
-      //console.log(articles);
       res.status(200).send({ articles });
     })
     .catch(next);
@@ -26,7 +23,6 @@ exports.getArticle = (req, res, next) => {
   let article_id = req.params.article_id;
   fetchArticle(article_id)
     .then(article => {
-      //console.log(article);
       res.status(200).send({ article: article[0] });
     })
     .catch(next);
@@ -55,7 +51,6 @@ exports.postComment = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
   let article_id = req.params.article_id;
-  //console.log(req.query);
 
   fetchComments(article_id, req.query.sort_by, req.query.order)
     .then(response => {

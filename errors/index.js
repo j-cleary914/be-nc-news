@@ -1,5 +1,5 @@
 exports.handlePSQLErrors = (err, req, res, next) => {
-  //console.log(err);
+  
   let errorObject = {
     "22P02": { status: 400, msg: "invalid input syntax, not an integer" },
     "42703": { status: 400, msg: "column does not exist" },
@@ -23,6 +23,6 @@ exports.handlePSQLErrors = (err, req, res, next) => {
 };
 
 exports.handleCustomErrors = (err, req, res, next) => {
-  //console.log(err);
+  
   res.status(err.status).send({ msg: err.msg });
 };

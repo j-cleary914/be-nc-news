@@ -50,7 +50,6 @@ describe("/api", () => {
         .get("/api/users/lurker")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           expect(response.body.user).to.eql({
             username: "lurker",
             name: "do_nothing",
@@ -158,7 +157,6 @@ describe("/api", () => {
         .get("/api/articles?author=icellusedkars")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           response.body.articles.forEach(article => {
             expect(article.author).to.equal("icellusedkars");
           });
@@ -169,7 +167,6 @@ describe("/api", () => {
         .get("/api/articles?author=lurker")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           response.body.articles.forEach(article => {
             expect(article.author).to.equal("lurker");
           });
@@ -190,7 +187,6 @@ describe("/api", () => {
         .get("/api/articles?topic=paper")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           expect(response.body.articles).to.eql([]);
         });
     });
@@ -209,7 +205,6 @@ describe("/api", () => {
           .get("/api/articles?topic=not-a-topic")
           .expect(404)
           .then(response => {
-            //console.log(response.body);
             expect(response.body.msg).to.equal(
               "attempted to sort by topic that doesn't exist"
             );
@@ -248,7 +243,6 @@ describe("/api", () => {
         .get("/api/articles/9")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           expect(response.body.article).to.have.all.keys([
             "author",
             "title",
@@ -344,7 +338,6 @@ describe("/api", () => {
         .get("/api/articles/5/comments")
         .expect(200)
         .then(response => {
-          //console.log(response.body.comments);
           expect(response.body.comments[0]).to.have.all.keys([
             "comment_id",
             "votes",
@@ -367,7 +360,6 @@ describe("/api", () => {
         .get("/api/articles/5/comments?sort_by=votes")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           expect(response.body.comments).to.be.sortedBy("votes", {
             descending: true
           });
@@ -378,7 +370,6 @@ describe("/api", () => {
         .get("/api/articles/5/comments?sort_by=votes&order=asc")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
           expect(response.body.comments).to.be.sortedBy("votes", {
             descending: false
           });
@@ -414,7 +405,6 @@ describe("/api", () => {
             .send({})
             .expect(400)
             .then(response => {
-              //console.log(response.body);
               expect(response.body.msg).to.equal(
                 "required value can not be null"
               );
@@ -489,7 +479,6 @@ describe("/api", () => {
           .patch("/api/comments/not-a-number")
           .expect(400)
           .then(response => {
-            //console.log(response.body);
             expect(response.body.msg).to.equal(
               "invalid input syntax, not an integer"
             );
@@ -501,7 +490,6 @@ describe("/api", () => {
           .patch("/api/comments/1000")
           .expect(404)
           .then(response => {
-            //console.log(response.body);
             expect(response.body.msg).to.equal("no comment with that ID found");
           });
       });
@@ -511,7 +499,6 @@ describe("/api", () => {
           .delete("/api/comments/1000")
           .expect(404)
           .then(response => {
-            //console.log(response.body);
             expect(response.body.msg).to.eql(
               "no comment with that comment_id exists"
             );

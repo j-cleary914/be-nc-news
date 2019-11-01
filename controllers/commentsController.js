@@ -17,7 +17,7 @@ exports.deleteComment = (req, res, next) => {
 
   destroyComment(comment_id)
     .then(response => {
-      //console.log({ response });
+     
       res.status(204).send({ response });
     })
     .catch(next);

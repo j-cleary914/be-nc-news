@@ -1,7 +1,7 @@
 const connection = require("../db/connection");
 
 exports.updateCommentVotes = (comment_id, updateBy = 0) => {
-  //console.log("comments model", comment_id, updateBy);
+  
   return connection
     .where({ comment_id: comment_id })
     .increment({ votes: updateBy }, ["comment_id", "votes"])
@@ -24,7 +24,7 @@ exports.destroyComment = id => {
     .from("comments")
     .where("comment_id", id)
     .then(deletedCommentCount => {
-      //console.log(deletedCommentCount);
+     
       if (deletedCommentCount === 0) {
         return Promise.reject({
           status: 404,
