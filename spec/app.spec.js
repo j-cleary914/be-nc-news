@@ -14,7 +14,7 @@ describe("/api", () => {
     connection.destroy();
   });
 
-  it.only("GET:200, responds with a json object describing all of the available endpoints on the API", () => {
+  it("GET:200, responds with a json object describing all of the available endpoints on the API", () => {
     return request(app)
       .get("/api")
       .expect(200)
