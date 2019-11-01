@@ -20,7 +20,7 @@ describe("/api", () => {
         .get("/api/topics")
         .expect(200)
         .then(response => {
-          expect(response.body).to.eql([
+          expect(response.body.topics).to.eql([
             { slug: "mitch", description: "The man, the Mitch, the legend" },
             { slug: "cats", description: "Not dogs" },
             { slug: "paper", description: "what books are made of" }
@@ -50,7 +50,8 @@ describe("/api", () => {
         .get("/api/users/lurker")
         .expect(200)
         .then(response => {
-          expect(response.body).to.eql({
+          //console.log(response.body);
+          expect(response.body.user).to.eql({
             username: "lurker",
             name: "do_nothing",
             avatar_url:
@@ -91,8 +92,8 @@ describe("/api", () => {
         .get("/api/articles")
         .expect(200)
         .then(response => {
-          expect(response.body).to.be.an("array");
-          expect(response.body[0]).to.be.an("object");
+          expect(response.body.articles).to.be.an("array");
+          expect(response.body.articles[0]).to.be.an("object");
         });
     });
     it("GET:200, articles in array have desired keys ", () => {
@@ -100,7 +101,7 @@ describe("/api", () => {
         .get("/api/articles")
         .expect(200)
         .then(response => {
-          expect(response.body[0]).to.have.all.keys([
+          expect(response.body.articles[0]).to.have.all.keys([
             "article_id",
             "title",
             "body",
@@ -117,8 +118,7 @@ describe("/api", () => {
         .get("/api/articles")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
-          expect(response.body).to.be.sortedBy("created_at", {
+          expect(response.body.articles).to.be.sortedBy("created_at", {
             descending: true
           });
         });
@@ -128,7 +128,7 @@ describe("/api", () => {
         .get("/api/articles?order=asc")
         .expect(200)
         .then(response => {
-          expect(response.body).to.be.sortedBy("created_at", {
+          expect(response.body.articles).to.be.sortedBy("created_at", {
             descending: false
           });
         });
@@ -138,7 +138,7 @@ describe("/api", () => {
         .get("/api/articles?sort_by=comment_count")
         .expect(200)
         .then(response => {
-          expect(response.body).to.be.sortedBy("comment_count", {
+          expect(response.body.articles).to.be.sortedBy("comment_count", {
             descending: true
           });
         });
@@ -148,8 +148,7 @@ describe("/api", () => {
         .get("/api/articles?sort_by=votes&order=asc")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
-          expect(response.body).to.be.sortedBy("votes", {
+          expect(response.body.articles).to.be.sortedBy("votes", {
             descending: false
           });
         });
@@ -160,8 +159,19 @@ describe("/api", () => {
         .expect(200)
         .then(response => {
           //console.log(response.body);
-          response.body.forEach(article => {
+          response.body.articles.forEach(article => {
             expect(article.author).to.equal("icellusedkars");
+          });
+        });
+    });
+    it("GET:200, returns an empty array when a user exists but has no articles", () => {
+      return request(app)
+        .get("/api/articles?author=lurker")
+        .expect(200)
+        .then(response => {
+          //console.log(response.body);
+          response.body.articles.forEach(article => {
+            expect(article.author).to.equal("lurker");
           });
         });
     });
@@ -170,32 +180,48 @@ describe("/api", () => {
         .get("/api/articles?topic=cats")
         .expect(200)
         .then(response => {
-          //console.log(response.body);
-          response.body.forEach(article => {
+          response.body.articles.forEach(article => {
             expect(article.topic).to.equal("cats");
           });
+        });
+    });
+    it("GET:200, returns an empty array when a topic exists but has no articles", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(response => {
+          //console.log(response.body);
+          expect(response.body.articles).to.eql([]);
         });
     });
     describe("ERRORS:", () => {
       it("GET:400, returns 400 when passed an author that doesnt exist", () => {
         return request(app)
           .get("/api/articles?author=not-an-author")
-          .expect(400)
+          .expect(404)
           .then(response => {
-            expect(response.body.msg).to.equal(
-              "attempted to sort by author that doesn't exist"
-            );
+            expect(response.body.msg).to.equal("no user with that username");
           });
       });
-      //add test for it returns empty array when passed a valid topic with no comments in it
-      it("GET:400, returns 400 when passed a column that doesnt exist", () => {
+
+      it("GET:404, returns 404 when passed a topic that doesn't exist", () => {
         return request(app)
-          .get("/api/articles?topic=not-a-column")
-          .expect(400)
+          .get("/api/articles?topic=not-a-topic")
+          .expect(404)
           .then(response => {
+            //console.log(response.body);
             expect(response.body.msg).to.equal(
               "attempted to sort by topic that doesn't exist"
             );
+          });
+      });
+
+      it("GET:400, returns 400 when passed a column that doesnt exist", () => {
+        return request(app)
+          .get("/api/articles?sort_by=not-a-column")
+          .expect(400)
+          .then(response => {
+            expect(response.body.msg).to.equal("column does not exist");
           });
       });
 
@@ -222,8 +248,8 @@ describe("/api", () => {
         .get("/api/articles/9")
         .expect(200)
         .then(response => {
-          // console.log(response.body);
-          expect(response.body).to.have.all.keys([
+          //console.log(response.body);
+          expect(response.body.article).to.have.all.keys([
             "author",
             "title",
             "article_id",
@@ -233,7 +259,7 @@ describe("/api", () => {
             "votes",
             "comment_count"
           ]);
-          expect(response.body.article_id).to.equal(9);
+          expect(response.body.article.article_id).to.equal(9);
         });
     });
 
@@ -356,11 +382,61 @@ describe("/api", () => {
           });
           return Promise.all(methodPromises);
         });
+        it("GET:404, returns 404 when given valid article-id that does not exist", () => {
+          return request(app)
+            .get("/api/articles/1000/comments")
+            .expect(404)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                "no article with that article_id"
+              );
+            });
+        });
+        it("POST:400, returns 400 when post body does not include required keys", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({})
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal(
+                "required value can not be null"
+              );
+            });
+        });
+        it("POST:something", () => {
+          return request(app)
+            .post("/api/articles/1000/comments")
+            .send({
+              username: "butter_bridge",
+              body: "a new and exciting comment"
+            })
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("foreign key violated");
+            });
+        });
+        it("GET:404, returns 404 when given valid article-id that does not exist", () => {
+          return request(app)
+            .get("/api/articles/1/comments?sort_by=not-a-valid-column")
+            .expect(400)
+            .then(response => {
+              expect(response.body.msg).to.equal("column does not exist");
+            });
+        });
       });
     });
   });
 
-  describe("/comments/:commend_id", () => {
+  describe("/comments/:comment_id", () => {
+    it("PATCH:200  does not update votes of a comment when no body is sent", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({})
+        .expect(200)
+        .then(response => {
+          expect(response.body.comment.votes).to.equal(16);
+        });
+    });
     it("PATCH:200  updates the votes of an comment by the given amount", () => {
       return request(app)
         .patch("/api/comments/1")
@@ -401,9 +477,19 @@ describe("/api", () => {
           });
       });
 
+      it("patch:404, throws an error when given a comment_id that doesnt exist", () => {
+        return request(app)
+          .patch("/api/comments/1000")
+          .expect(404)
+          .then(response => {
+            //console.log(response.body);
+            expect(response.body.msg).to.equal("no comment with that ID found");
+          });
+      });
+
       it("DELETE:404  returns 404 if a comment that doesnt exist", () => {
         return request(app)
-          .delete("/api/comments/1111")
+          .delete("/api/comments/1000")
           .expect(404)
           .then(response => {
             //console.log(response.body);

@@ -12,9 +12,12 @@ exports.getArticles = (req, res, next) => {
   let sort_by = req.query.sort_by;
   let author = req.query.author;
   let topic = req.query.topic;
+
+  //console.log({ sort_by }, { order }, { author }, { topic });
   fetchArticles(sort_by, order, author, topic)
     .then(articles => {
-      res.status(200).send(articles);
+      //console.log(articles);
+      res.status(200).send({ articles });
     })
     .catch(next);
 };
@@ -24,7 +27,7 @@ exports.getArticle = (req, res, next) => {
   fetchArticle(article_id)
     .then(article => {
       //console.log(article);
-      res.status(200).send(article[0]);
+      res.status(200).send({ article: article[0] });
     })
     .catch(next);
 };

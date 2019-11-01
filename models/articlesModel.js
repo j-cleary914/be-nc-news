@@ -1,13 +1,14 @@
 const connection = require("../db/connection");
 
 const { fetchTopics } = require("../models/topicsModel");
+const { fetchUsers } = require("../models/usersModel");
 exports.fetchArticles = (
   sort_by = "created_at",
   order = "desc",
   author,
   topic
 ) => {
-  //console.log(sort_by, order, author, topic);
+  //console.log({ sort_by }, { order }, { author }, { topic });
   return connection
     .select("articles.*")
     .from("articles")
@@ -24,33 +25,51 @@ exports.fetchArticles = (
       }
     })
     .then(articles => {
-      //console.log(articles);
-
       if (articles.length > 0) {
-        return [articles];
-      } else {
+        //console.log("returning articles");
+        return [articles]; //passing article array onto next .then block//
+      } else if (topic) {
+        //console.log("returning topic promise");
         let topicPromise = fetchTopics();
         return Promise.all([articles, topicPromise]);
+      } else if (author) {
+        //console.log("returning user promise");
+        let usersPromise = fetchUsers(author);
+        return Promise.all([articles, usersPromise]);
       }
     })
     .then(response => {
-      [articles, topicArray] = response;
-      //console.log(articles, topic, topicArray);
+      [articles, promiseArray] = response;
+      // console.log({ articles }, { sort_by }, { order }, { author }, { topic });
+      // console.log(articles, promiseArray);
       if (articles.length > 0) {
-        return articles;
+        return articles; //returning article array to controller
       }
+
+      if (author) {
+        return [];
+      }
+
       if (topic) {
-        topicArray.forEach(topic => {
-          // console.log(topic.slug === topic);
-          if (topic.slug === topic) {
-            return articles;
+        let count = 0;
+        promiseArray.forEach(topicObj => {
+          //console.log(topicObj.slug === topic);
+          if (topicObj.slug === topic) {
+            // console.log(
+            //   "retuning empty array - topic existed but no articles found"
+            // );
+            count++;
           }
         });
+        if (count > 0) {
+          return [];
+        }
+        // console.log("erroring out - topic did not exist");
+        return Promise.reject({
+          status: 404,
+          msg: "attempted to sort by topic that doesn't exist"
+        });
       }
-      return Promise.reject({
-        status: 400,
-        msg: "attempted to sort by topic that doesn't exist"
-      });
     });
 };
 
@@ -100,9 +119,18 @@ exports.addComment = (article_id, username, comment) => {
 };
 
 exports.fetchComments = (article_id, sort_by, order) => {
-  // console.log(article_id, sort_by);
+  //console.log(article_id, sort_by);
   return connection("comments")
     .where("article_id", article_id)
     .select("comment_id", "votes", "created_at", "author", "body")
-    .orderBy(sort_by || "created_at", order || "desc");
+    .orderBy(sort_by || "created_at", order || "desc")
+    .then(x => {
+      if (x.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "no article with that article_id"
+        });
+      }
+      return x;
+    });
 };
