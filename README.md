@@ -12,9 +12,9 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 In order to get this running on your local machine you will need the following installed
 
--[NodeJS](https://nodejs.org/en/)
--[npm](https://www.npmjs.com/)
--PostgreSQL 
+- [NodeJS](https://nodejs.org/en/)
+- [npm](https://www.npmjs.com/)
+- PostgreSQL 
 
 
 ### Installing
