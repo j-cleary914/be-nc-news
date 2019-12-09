@@ -1,6 +1,6 @@
 # NC News api
 
-This is the home of the back end for my NC News website created during the Northcoders Bootcamp.  The hosted API is [here](https://northcoder-news-backend.herokuapp.com/api). The front end react app for this project can be found [here](https://github.com/j-cleary914/fe-nc-news).
+This is the home of the back end for my NC News website created during the Northcoders Bootcamp.  The hosted API is [here](https://ncs-news-be.herokuapp.com/api). The front end react app for this project can be found [here](https://github.com/j-cleary914/fe-nc-news).
   
 The entire thing is hosted at https://nc-news-draft.netlify.com
 
